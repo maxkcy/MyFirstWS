@@ -1,0 +1,17 @@
+apply plugin: 'application'
+
+sourceCompatibility = 8.0
+mainClassName = 'com.maxmyfirstws.headless.HeadlessLauncher'
+eclipse.project.name = appName + '-headless'
+
+dependencies {
+	implementation project(':core')
+	implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+	implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+	implementation "com.github.MrStahlfelge.gdx-websockets:common:$websocketVersion"
+	//api "com.github.czyzby:gdx-websocket-common:1.9.1.9.11-SNAPSHOT"
+	compile 'io.vertx:vertx-core:4.0.1-SNAPSHOT'
+
+	api project(':shared')
+}

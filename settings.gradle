@@ -1,0 +1,1 @@
+include 'headless', 'shared', 'html', 'lwjgl3', 'core'
