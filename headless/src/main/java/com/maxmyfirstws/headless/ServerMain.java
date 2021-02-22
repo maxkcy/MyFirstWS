@@ -36,7 +36,6 @@ public class ServerMain extends Game {
         PacketsSerializer.register(manualSerializer);
         player = new Player(3000);
         this.launch();
-
     }
 
     @Override
@@ -112,11 +111,11 @@ public class ServerMain extends Game {
             final Attack response = new Attack();
             response.setAttack(((Attack) request).getAttack());
             player.setHealth(player.getHealth() - response.getAttack());
-            final Message messageResponse = new Message("Oh no, the player have been hurt. New health = " + player.getHealth());
+            final Message messageResponse = new Message("Ouch! OUCH! OuCh! New health = " + player.getHealth());
 
-            //webSocket.remoteAddress() = connectedPlayerList.get(0);
+            //webSocket.remoteAddress() = connectedPlayerList.get(0); <--line is error, can't do it this way
             webSocket.writeFinalBinaryFrame(Buffer.buffer(manualSerializer.serialize(messageResponse)));
-            //System.out.println("Data sent to: " + webSocket.remoteAddress());
+            System.out.println("Data sent to: " + webSocket.remoteAddress());
             //^ I want to write to specific httpConnecitions.
 
 
@@ -125,12 +124,13 @@ public class ServerMain extends Game {
             final Heal response = new Heal();
             response.setHeal(((Heal) request).getHeal());
             player.setHealth(player.getHealth() + response.getHeal());
-            final Message messageResponse = new Message("Thank you very much kind person, " +
+            final Message messageResponse = new Message("Thx for helping me! " +
                     "New Heath = " +
                     + player.getHealth());
             webSocket.writeFinalBinaryFrame(Buffer.buffer(manualSerializer.serialize(messageResponse)));
             System.out.println("Data send to: " + webSocket.remoteAddress());
         }
     }
-    
+
+    //I want to send data/write data independent of a request... how?
 }
