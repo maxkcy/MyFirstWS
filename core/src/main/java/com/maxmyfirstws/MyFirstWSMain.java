@@ -13,8 +13,8 @@ import com.maxmyfirstws.MyPackets.Heal;
 import com.maxmyfirstws.MyPackets.Message;
 
 public class MyFirstWSMain extends Game {
-    public static final int WIDTH = 80;
-    public static final int HEIGHT = 80;
+    public static final int WIDTH = 300;
+    public static final int HEIGHT = 200;
 
     WebSocket webSocket;
     ManualSerializer serializer;
