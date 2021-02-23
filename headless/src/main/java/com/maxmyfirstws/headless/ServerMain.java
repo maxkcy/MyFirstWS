@@ -9,6 +9,7 @@ import com.maxmyfirstws.MyPackets.Message;
 import com.maxmyfirstws.PacketsSerializer;
 import com.maxmyfirstws.headless.Player.Player;
 
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -27,6 +28,8 @@ public class ServerMain extends Game {
     Player player;
     HttpServer httpServer;
     Array<SocketAddress> connectedPlayerList = new Array<>();
+    Array<String> cPList = new Array<>();
+    Array<ServerWebSocket> clientWSList = new Array<>();
 
 
     @Override
@@ -59,15 +62,40 @@ public class ServerMain extends Game {
 
         }).listen(8000);*/
         System.out.print("Launching Server...");
+
         httpServer.webSocketHandler(new Handler<ServerWebSocket>() {
             @Override
-            public void handle(ServerWebSocket webSocket) {
-                webSocket.frameHandler(new Handler<WebSocketFrame>() {
+            public void handle(ServerWebSocket client) {
+                System.out.println("connection from (WS handler)"+ client.textHandlerID());
+                cPList.add(client.textHandlerID());
+                clientWSList.add(client);
+
+                client.frameHandler(new Handler<WebSocketFrame>() {
                     @Override
                     public void handle(WebSocketFrame frame) {
-                        handleFrame(webSocket, frame);
+                        handleFrame(client, frame);
                     }
                 });
+
+                client.closeHandler(new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        System.out.println("client disconected (WS hander)"+ client.textHandlerID());
+                        cPList.removeValue(client.textHandlerID(), false);
+                        System.out.println("player removed from list");
+                        clientWSList.removeValue(client, true);
+                    }
+                });
+                final Attack response = new Attack();
+                response.setAttack(5);
+                player.setHealth(player.getHealth() - response.getAttack());
+                final Message messageResponse = new Message("ah new player hit me on arrival! now my health is " + player.getHealth());
+               for (ServerWebSocket clientTemp : clientWSList){
+                clientTemp.writeFinalBinaryFrame(Buffer.buffer(manualSerializer.serialize(messageResponse)));}
+
+
+
+
             }
         });
 
@@ -99,6 +127,18 @@ public class ServerMain extends Game {
 
 
         httpServer.listen(8777);
+
+
+        vertx.setPeriodic(10000, new Handler<Long>() {
+            @Override
+            public void handle(Long event) {
+                Message time = new Message("The current time is " + java.time.LocalDateTime.now());
+                for (ServerWebSocket client : clientWSList){
+
+                    client.writeFinalBinaryFrame(Buffer.buffer(manualSerializer.serialize(time)));
+                }
+            }
+        });
     }
 
 

@@ -73,6 +73,7 @@ public class MyFirstWSMain extends Game {
 
     @Override
     public void dispose() {
+        WebSockets.closeGracefully(webSocket);
         webSocket.close();
         super.dispose();
     }
